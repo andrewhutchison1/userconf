@@ -1,0 +1,15 @@
+; Userconf grammar
+
+document            ::= record_content
+
+value               ::= quoted_string | unquoted_string | multiline_string | array | record
+
+record              ::= '{' record_content '}'
+record_content      ::= record_item (',' record_item)* [',']
+                      | e
+record_item         ::= record_key value
+record_key          ::= quoted_string | unquoted_string
+
+array               ::= '[' array_content ']'
+array_content       ::= value (',' value)* [',']
+                      | e
