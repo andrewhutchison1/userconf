@@ -24,7 +24,7 @@ class TokenKind(Enum):
                 TokenKind.MULTILINE_STRING)
 
 class Token:
-    def __init__(self, kind, spelling=None, *, leading_newline=False):
+    def __init__(self, kind, leading_newline, spelling=None):
         """Initialises the Token object with a TokenKind, an optional spelling if `kind` is
         a string token kind, and a boolean indicating whether the token contains leading
         (preceding) newline characters (used for automatic comma insertion in the parser).
@@ -203,7 +203,7 @@ class Scanner:
                 string.append(self._peek())
                 self._advance()
 
-        return Token(TokenKind.QUOTED_STRING, ''.join(string), leading_newline=leading_newline)
+        return Token(TokenKind.QUOTED_STRING, leading_newline, ''.join(string))
 
     def _scan_multiline_string_line(self):
         if not self._accept('>'):
@@ -230,8 +230,7 @@ class Scanner:
             self._skip_whitespace()
             line = self._scan_multiline_string_line()
 
-        return Token(TokenKind.MULTILINE_STRING, ''.join(multiline),
-                leading_newline=leading_newline)
+        return Token(TokenKind.MULTILINE_STRING, leading_newline, ''.join(multiline))
 
     def _scan_unquoted_string(self, leading_newline):
         """Attempts to scan an unquoted string, returning a Token representing the unquoted
@@ -248,7 +247,7 @@ class Scanner:
         if len(string) == 0:
             return None
 
-        return Token(TokenKind.UNQUOTED_STRING, ''.join(string), leading_newline=leading_newline)
+        return Token(TokenKind.UNQUOTED_STRING, leading_newline, ''.join(string))
 
     def reset(self, source):
         """Resets the state of the scanner, with a new source.
@@ -267,15 +266,15 @@ class Scanner:
             return None
 
         if self._accept('{'):
-            return Token(TokenKind.BRACE_OPEN, leading_newline=leading_newline)
+            return Token(TokenKind.BRACE_OPEN, leading_newline)
         elif self._accept('}'):
-            return Token(TokenKind.BRACE_CLOSE, leading_newline=leading_newline)
+            return Token(TokenKind.BRACE_CLOSE, leading_newline)
         elif self._accept('['):
-            return Token(TokenKind.BRACK_OPEN, leading_newline=leading_newline)
+            return Token(TokenKind.BRACK_OPEN, leading_newline)
         elif self._accept(']'):
-            return Token(TokenKind.BRACK_CLOSE, leading_newline=leading_newline)
+            return Token(TokenKind.BRACK_CLOSE, leading_newline)
         elif self._accept(','):
-            return Token(TokenKind.COMMA, leading_newline=leading_newline)
+            return Token(TokenKind.COMMA, leading_newline)
 
         if quoted_string := self._scan_quoted_string(leading_newline):
             return quoted_string
