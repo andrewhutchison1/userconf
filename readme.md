@@ -5,11 +5,11 @@ A Python 3.8 implementation of the userconf configuration file format.
 Userconf (user configuration format) is a user-oriented configuration file
 format that is designed to be:
 
-    - Simple, unsurprising and intuitive
-    - Easy for humans to read
-    - Easy for humans to modify
-    - Easy for machines to parse
-    - Programming language agnostic
+- Simple, unsurprising and intuitive
+- Easy for humans to read
+- Easy for humans to modify
+- Easy for machines to parse
+- Programming language agnostic
 
 ## The Userconf file format
 
