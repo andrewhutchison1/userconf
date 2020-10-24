@@ -60,7 +60,7 @@ class RecordItem(Node):
         return self._value
 
     def __iter__(self):
-        return self.key, self.value
+        return iter((self.key, self.value))
 
     @value.setter
     def value(self, value):
