@@ -3,10 +3,20 @@
 from .scan import Token, TokenKind
 
 class AbstractNode:
-    pass
+    def __init__(self):
+        self._parent = None
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, parent):
+        self._parent = parent
 
 class String(AbstractNode):
     def __init__(self, data):
+        super().__init__()
         assert isinstance(data, str)
         self._data = data
 
@@ -16,16 +26,18 @@ class String(AbstractNode):
 
     @data.setter
     def data(self, data):
-        self._data = data 
+        self._data = data
 
 class Node(AbstractNode):
     def __init__(self, /, child_types=AbstractNode):
+        super().__init__()
         self._children = []
         self._child_types = child_types
 
     def add_child(self, child):
         assert isinstance(child, self._child_types)
         self._children.append(child)
+        child.parent = self
 
     @property
     def children(self):
@@ -48,16 +60,16 @@ class RecordItem(Node):
         super().__init__()
         assert isinstance(key, String)
         assert isinstance(value, (Record, Array, String))
-        self._key = key
-        self._value = value
+        self.add_child(key)
+        self.add_child(value)
 
     @property
     def key(self):
-        return self._key
+        return self.children[0]
 
     @property
     def value(self):
-        return self._value
+        return self.children[1]
 
     def __iter__(self):
         return iter((self.key, self.value))
@@ -65,18 +77,15 @@ class RecordItem(Node):
     @value.setter
     def value(self, value):
         assert isinstance(value, (Record, Array, String))
-        self._value = value
-
-    @property
-    def children(self):
-        return [self.key, self.value]
+        self.children[1] = value
 
 class ASTDecoder:
     """Decodes a userconf AST into a Python object."""
     def __init__(self, root):
         """Initialises the AST decoder with the AST subtree rooted at `root`.
         """
-        pass
+        self._root = root
+        self._result = {}
 
 def pretty_print(node):
     """Pretty-prints an AST subtree rooted at `node`.
@@ -114,4 +123,3 @@ def _pretty_print_impl(node, lines, prefix='', is_last_node=True):
             is_last_node = False
 
         _pretty_print_impl(child, lines, prefix, is_last_node)
-
