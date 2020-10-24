@@ -67,3 +67,18 @@ class RecordItem(Node):
     @property
     def children(self):
         return [self.key, self.value]
+
+def pretty_print(node):
+    """Pretty-prints an AST subtree rooted at `node`.
+    Returns a string containing the pretty-printed AST subtree.
+    """
+    lines = []
+    _pretty_print_impl(node, lines)
+    return '\n'.join(lines)
+
+def _pretty_print_impl(node, lines=None, prefix='', is_last_node=True):
+    """Implementation function for `pretty-print`.
+    Implements a pretty-printing algorithm, returning a list of strings that
+    should be joined with newlines to form the final output string.
+    """
+    pass
