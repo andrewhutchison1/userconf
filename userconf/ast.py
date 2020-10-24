@@ -59,6 +59,9 @@ class RecordItem(Node):
     def value(self):
         return self._value
 
+    def __iter__(self):
+        return self.key, self.value
+
     @value.setter
     def value(self, value):
         assert isinstance(value, (Record, Array, String))
