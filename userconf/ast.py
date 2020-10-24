@@ -76,9 +76,32 @@ def pretty_print(node):
     _pretty_print_impl(node, lines)
     return '\n'.join(lines)
 
-def _pretty_print_impl(node, lines=None, prefix='', is_last_node=True):
+def _pretty_print_impl(node, lines, prefix='', is_last_node=True):
     """Implementation function for `pretty-print`.
-    Implements a pretty-printing algorithm, returning a list of strings that
-    should be joined with newlines to form the final output string.
+    Implements the pretty-printing algorithm by recursively appending
+    pretty-printed lines of text to the list `lines`.
     """
-    pass
+    if isinstance(node, String):
+        child_count = 0
+        node_string = f'String {repr(node.data)}'
+    else:
+        child_count = len(node.children)
+        node_string = node.__class__.__name__
+
+    lines.append(f'{prefix}{"`- " if is_last_node else "|- "}{node_string}')
+    if is_last_node:
+        prefix += '   '
+    else:
+        prefix += '|  '
+
+    if child_count == 0:
+        return
+
+    for i,child in enumerate(node.children):
+        if i == child_count - 1:
+            is_last_node = True
+        else:
+            is_last_node = False
+
+        _pretty_print_impl(child, lines, prefix, is_last_node)
+
