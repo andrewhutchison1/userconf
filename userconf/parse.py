@@ -1,6 +1,8 @@
 """Userconf parser classes and functions.
 """
 from functools import wraps
+
+from . import ast
 from .scan import TokenKind
 
 class ParseResult:
@@ -75,24 +77,43 @@ class Parser:
 
     @production
     def parse(self):
+        """Parses the top-level of a Userconf file.
+        Returns a ParseResult that contains ast.Document if successful.
+        """
         record_content = self.parse_record_content()
+
         if record_content and self.at_end:
-            return dict(record_content.data)
+            document = ast.Document()
+            for record_item in record_content.data:
+                document.add_child(record_item)
+
+            return document
 
         raise ParseError(f'Expected end of input, got {self.cur.kind.name}')
 
     @production
     def parse_record(self):
+        """Parses a record.
+        Returns a ParseResult that contains ast.Record if successful.
+        """
         if not self._accept(TokenKind.BRACE_OPEN):
             return False
 
         record_content = self.parse_record_content()
-
         self._expect(TokenKind.BRACE_CLOSE)
-        return dict(record_content.data)
+
+        record = ast.Record()
+        for record_item in record_content.data:
+            record.add_child(record_item)
+
+        return record
 
     @production
     def parse_record_content(self):
+        """Parses the contents of a record, which is also the top-level document syntax.
+        On success, returns a ParseResult that contains a list of ast.RecordItem objects
+        representing each record item, in the order they were specified.
+        """
         record_item = self.parse_record_item()
         if not record_item:
             return []
@@ -108,33 +129,43 @@ class Parser:
 
     @production
     def parse_record_item(self):
-        record_key = self.parse_record_key()
-        if not record_key:
+        """Parses a record item, which are the elements in which a record is composed of.
+        On success, returns a ParseResult contains an ast.RecordItem object representing
+        the key and value of the record item.
+        """
+        key = self.parse_record_key()
+        if not key:
             return False
 
         value = self.parse_value()
         if not value:
             return False
 
-        return (record_key.data, value.data)
+        return ast.RecordItem(key.data, value.data)
 
     @production
     def parse_record_key(self):
+        """Parses a record key, returning a ParseResult containing an ast.String object
+        on success.
+        """
         if quoted_string := self._accept(TokenKind.QUOTED_STRING):
-            return quoted_string.spelling
+            return ast.String(quoted_string.spelling)
         elif unquoted_string := self._accept(TokenKind.UNQUOTED_STRING):
-            return unquoted_string.spelling
+            return ast.String(unquoted_string.spelling)
 
         return False
 
     @production
     def parse_value(self):
+        """Parses a value, which is a string, record or array. On success, returns a ParseResult
+        containing one of ast.String, ast.Record or ast.Array.
+        """
         if quoted_string := self._accept(TokenKind.QUOTED_STRING):
-            return quoted_string.spelling
+            return ast.String(quoted_string.spelling)
         elif unquoted_string := self._accept(TokenKind.UNQUOTED_STRING):
-            return unquoted_string.spelling
+            return ast.String(unquoted_string.spelling)
         elif multiline_string := self._accept(TokenKind.MULTILINE_STRING):
-            return multiline_string.spelling
+            return ast.String(multiline_string.spelling)
         elif record := self.parse_record():
             return record.data
         elif array := self.parse_array():
@@ -144,15 +175,25 @@ class Parser:
 
     @production
     def parse_array(self):
+        """Parses an array, returning a ParseResult containing an ast.Array object on success.
+        """
         if not self._accept(TokenKind.BRACK_OPEN):
             return False
 
         array_content = self.parse_array_content()
         self._expect(TokenKind.BRACK_CLOSE)
-        return array_content.data
+
+        array = ast.Array()
+        for array_item in array_content.data:
+            array.add_child(array_item)
+
+        return array
     
     @production
     def parse_array_content(self):
+        """Parses the contents of an array, returning a ParseResult containing a list of
+        either ast.String, ast.Array or ast.Record objects on success.
+        """
         value = self.parse_value()
         if not value:
             return []
