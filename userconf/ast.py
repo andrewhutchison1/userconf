@@ -68,6 +68,13 @@ class RecordItem(Node):
     def children(self):
         return [self.key, self.value]
 
+class ASTDecoder:
+    """Decodes a userconf AST into a Python object."""
+    def __init__(self, root):
+        """Initialises the AST decoder with the AST subtree rooted at `root`.
+        """
+        pass
+
 def pretty_print(node):
     """Pretty-prints an AST subtree rooted at `node`.
     Returns a string containing the pretty-printed AST subtree.
