@@ -43,17 +43,42 @@ class Node(AbstractNode):
     def children(self):
         return self._children
 
-class Document(Node):
+class KeyValueNode(Node):
     def __init__(self):
         super().__init__(child_types=RecordItem)
 
-class Record(Node):
+    def __getitem__(self, key):
+        result = []
+        for child in self.children:
+            if child.key.data == key:
+                result.append(child.value)
+
+        return result
+
+    def __contains__(self, key):
+        for child in self.children:
+            if child.key.data == key:
+                return True
+
+        return False
+
+class Document(KeyValueNode):
     def __init__(self):
-        super().__init__(child_types=RecordItem)
+        super().__init__()
+
+class Record(KeyValueNode):
+    def __init__(self):
+        super().__init__()
 
 class Array(Node):
     def __init__(self):
         super().__init__(child_types=(Record, String, Array))
+
+    def __getitem__(self, index):
+        return self.children[index]
+
+    def __len__(self):
+        return len(self.children)
 
 class RecordItem(Node):
     def __init__(self, key, value):
