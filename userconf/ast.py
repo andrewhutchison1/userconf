@@ -79,14 +79,6 @@ class RecordItem(Node):
         assert isinstance(value, (Record, Array, String))
         self.children[1] = value
 
-class ASTDecoder:
-    """Decodes a userconf AST into a Python object."""
-    def __init__(self, root):
-        """Initialises the AST decoder with the AST subtree rooted at `root`.
-        """
-        self._root = root
-        self._result = {}
-
 def pretty_print(node):
     """Pretty-prints an AST subtree rooted at `node`.
     Returns a string containing the pretty-printed AST subtree.
@@ -123,3 +115,14 @@ def _pretty_print_impl(node, lines, prefix='', is_last_node=True):
             is_last_node = False
 
         _pretty_print_impl(child, lines, prefix, is_last_node)
+
+def _array_index_of_node(node):
+    """Returns the (0-based) index of `node` if it is an array element.
+    If it is not an array element, then None is returned.
+    """
+    if not isinstance(node.parent, Array):
+        return None
+
+    for i,child in enumerate(node.parent.children):
+        if child is node:
+            return i
