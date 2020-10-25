@@ -47,6 +47,13 @@ class KeyValueNode(Node):
     def __init__(self):
         super().__init__(child_types=RecordItem)
 
+    def keys(self):
+        result = []
+        for child in self.children:
+            result.append(child.key.data)
+
+        return result
+
     def __getitem__(self, key):
         result = []
         for child in self.children:
@@ -103,6 +110,16 @@ class RecordItem(Node):
     def value(self, value):
         assert isinstance(value, (Record, Array, String))
         self.children[1] = value
+
+def decode(root):
+    """Decodes an AST subtree rooted at `root` into a Python data structure.
+    """
+    if isinstance(root, String):
+        return root.data
+    elif isinstance(root, Array):
+        decoded_children = [decode(child) for child in root.children]
+    elif isinstance(root, (Document, Record)):
+        pass
 
 def pretty_print(node):
     """Pretty-prints an AST subtree rooted at `node`.
