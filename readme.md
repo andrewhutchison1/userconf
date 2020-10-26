@@ -25,33 +25,31 @@ data types are records and arrays.
 
 Here is an example Userconf file, which showcases all of its syntactic features:
 
-```
-; Example Userconf file
-profile     "default"
+    ; Example Userconf file
+    profile     "default"
 
-owner
-{
-    name    Andrew
-    role    admin
-}
+    owner
+    {
+        name    Andrew
+        role    admin
+    }
 
-database
-{
-    enabled true
-    ports   [8000, 8001, 8002]
-}
+    database
+    {
+        enabled true
+        ports   [8000, 8001, 8002]
+    }
 
-servers
-{
-    alpha   {ip 10.0.0.1, role frontend},
-    beta    {ip 10.0.0.2, role frontend},
-}
+    servers
+    {
+        alpha   {ip 10.0.0.1, role frontend},
+        beta    {ip 10.0.0.2, role frontend},
+    }
 
-welcome-banner
-    >Welcome to our server!
-    >\nPress any key to continue, or CTRL-C to close the current connection.
-    >\nEnjoy your stay!
-```
+    welcome-banner
+        >Welcome to our server!
+        >\nPress any key to continue, or CTRL-C to close the current connection.
+        >\nEnjoy your stay!
 
 ### Features
 
@@ -62,9 +60,7 @@ There are three different ways to specify a string: *unquoted*, *quoted* and *mu
 
 ##### Unquoted strings
 
-```
-unquoted_string
-```
+    unquoted_string
 
 A contiguous sequence of characters that does not contain any whitespace or reserved characters
 (`{}[],;`) is an *unquoted string*.
@@ -74,9 +70,7 @@ a linefeed character.
 
 ##### Quoted strings
 
-```
-"quoted string"
-```
+    "quoted string"
 
 A double-quote delimited sequence of characters is a *quoted string*.
 Quoted strings can contain any character except literal newlines, and the following escape
@@ -89,10 +83,8 @@ sequences are interpreted specially:
 
 ##### Multiline strings
 
-```
->This is a
-> multiline string
-```
+    >This is a
+    > multiline string
 
 Multiline strings allow a user to specify a string that may span more than one line of userconf
 source.
