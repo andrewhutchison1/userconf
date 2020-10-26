@@ -6,6 +6,55 @@ class AbstractNode:
     def __init__(self):
         self._parent = None
 
+    def _is_transitive_array_element(self):
+        """Returns True if this AST node or any of its ancestors are elements of an array AST
+        node, and False otherwise. This is used in determining whether an AST node has a merge
+        path.
+        """
+        return any(isinstance(ancestor, Array) for ancestor in self._ancestors())
+
+    def _ancestors(self):
+        """Returns a list of the ancestors of this AST node, ordered in ascending order
+        of degree of separation."""
+        node = self.parent
+        result = []
+        while node is not None:
+            result.append(node)
+            node = node.parent
+
+        return result
+
+    def _has_path(self):
+        """Returns True if this node has a merge path, and False otherwise."""
+        # Transitive array elements do not have merge paths because arrays do not merge, they
+        # overwrite. Only strings, records and arrays can possibly have merge paths
+        if not isinstance(self, (String, Record, Array)) or self._is_transitive_array_element():
+            return False
+
+        # String nodes have merge paths only when they are the values of a record or document,
+        # not the key.
+        if isinstance(self, String) and self is not self.parent.value:
+            return False
+
+        return True
+
+    def _path(self):
+        """Returns the merge path of this AST node if it has one; and None otherwise.
+        The merge path is returned as a tuple of strings.
+        """
+        if not self._has_path():
+            return None
+
+        path = []
+        node = self
+        while node.parent is not None:
+            if isinstance(node.parent, RecordItem):
+                path.append(node.parent.key.data)
+
+            node = node.parent
+
+        return tuple(reversed(path))
+
     @property
     def parent(self):
         return self._parent
