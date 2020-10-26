@@ -65,6 +65,27 @@ class AbstractNode:
     def parent(self, parent):
         self._parent = parent
 
+def iter_preorder(root):
+    """Performs a preorder traversal of the AST subtree rooted at `root`."""
+    yield root
+
+    if isinstance(root, String):
+        return
+
+    for child in root.children:
+        yield from iter_preorder(child)
+
+def _path_common_prefix(first, second):
+    """Returns the common prefix of two merge paths, or None if there is no common prefix."""
+    result = []
+    for f,s in zip(first, second):
+        if f == s:
+            result.append(f)
+        else:
+            break
+
+    return tuple(result) if len(result) != 0 else None
+
 class String(AbstractNode):
     def __init__(self, data):
         super().__init__()
@@ -102,6 +123,10 @@ class Record(Node):
     def __init__(self):
         super().__init__(child_types=RecordItem)
 
+    @property
+    def keys(self):
+        return [key.data for key,_ in self.children]
+
 class Array(Node):
     def __init__(self):
         super().__init__(child_types=(Record, String, Array))
@@ -129,6 +154,17 @@ class RecordItem(Node):
     def value(self, value):
         assert isinstance(value, (Record, Array, String))
         self.children[1] = value
+
+class Decoder:
+    """Decodes an AST into a Python data structure."""
+    def __init__(self, root):
+        self._root = root
+        self._data = {}
+
+    def decode(self):
+        for node in iter_preorder(self._root):
+            if node.has_path:
+                self._data[node.path] = node
 
 def pretty_print(node):
     """Pretty-prints an AST subtree rooted at `node`.
