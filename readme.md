@@ -92,6 +92,6 @@ Multiline strings are specified by userconf source lines that begin with the `>`
 end in a literal newline.
 When these lines appear consecutively, they are joined verbatim to form the logical string.
 Multiline strings are not raw: newlines are not interpreted as literal newlines (so the example
-multiline string above is exactly equal to "This is a multiline string").
+multiline string above is exactly equal to `"This is a multiline string"`).
 In particular, multiline strings interpret exactly the same escape sequences as quoted strings.
 Note that multiline strings may not appear as keys in a record.
