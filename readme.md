@@ -52,3 +52,54 @@ welcome-banner
     >\nPress any key to continue, or CTRL-C to close the current connection.
     >\nEnjoy your stay!
 ```
+
+### Features
+
+#### Strings
+
+The only atomic datatype in Userconf is the string.
+There are three different ways to specify a string: *unquoted*, *quoted* and *multiline*.
+
+##### Unquoted strings
+
+```
+unquoted_string
+```
+
+A contiguous sequence of characters that does not contain any whitespace or reserved characters
+(`{}[],;`) is an *unquoted string*.
+Escape sequences are not interpreted in any special manner in unquoted strings,
+so the unquoted string `hello\nthere` will literally contain the characters `\` and `n` and not
+a linefeed character.
+
+##### Quoted strings
+
+```
+"quoted string"
+```
+
+A double-quote delimited sequence of characters is a *quoted string*.
+Quoted strings can contain any character except literal newlines, and the following escape
+sequences are interpreted specially:
+
+- `\n` (newline)
+- `\t` (tab)
+- `\"` (literal double quote)
+- `\uXXXX` (hexademical unicode codepoint)
+
+##### Multiline strings
+
+```
+>This is a
+> multiline string
+```
+
+Multiline strings allow a user to specify a string that may span more than one line of userconf
+source.
+Multiline strings are specified by userconf source lines that begin with the `>` character and
+end in a literal newline.
+When these lines appear consecutively, they are joined verbatim to form the logical string.
+Multiline strings are not raw: newlines are not interpreted as literal newlines (so the example
+multiline string above is exactly equal to "This is a multiline string").
+In particular, multiline strings interpret exactly the same escape sequences as quoted strings.
+Note that multiline strings may not appear as keys in a record.
