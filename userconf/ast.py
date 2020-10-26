@@ -54,20 +54,12 @@ class KeyValueNode(Node):
 
         return result
 
-    def __getitem__(self, key):
+    def values(self):
         result = []
         for child in self.children:
-            if child.key.data == key:
-                result.append(child.value)
+            result.append(child.value)
 
         return result
-
-    def __contains__(self, key):
-        for child in self.children:
-            if child.key.data == key:
-                return True
-
-        return False
 
 class Document(KeyValueNode):
     def __init__(self):
@@ -80,12 +72,6 @@ class Record(KeyValueNode):
 class Array(Node):
     def __init__(self):
         super().__init__(child_types=(Record, String, Array))
-
-    def __getitem__(self, index):
-        return self.children[index]
-
-    def __len__(self):
-        return len(self.children)
 
 class RecordItem(Node):
     def __init__(self, key, value):
