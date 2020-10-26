@@ -24,7 +24,8 @@ class AbstractNode:
 
         return result
 
-    def _has_path(self):
+    @property
+    def has_path(self):
         """Returns True if this node has a merge path, and False otherwise."""
         # Transitive array elements do not have merge paths because arrays do not merge, they
         # overwrite. Only strings, records and arrays can possibly have merge paths
@@ -38,11 +39,12 @@ class AbstractNode:
 
         return True
 
-    def _path(self):
+    @property
+    def path(self):
         """Returns the merge path of this AST node if it has one; and None otherwise.
         The merge path is returned as a tuple of strings.
         """
-        if not self._has_path():
+        if not self.has_path:
             return None
 
         path = []
@@ -92,31 +94,13 @@ class Node(AbstractNode):
     def children(self):
         return self._children
 
-class KeyValueNode(Node):
+class Document(Node):
     def __init__(self):
         super().__init__(child_types=RecordItem)
 
-    def keys(self):
-        result = []
-        for child in self.children:
-            result.append(child.key.data)
-
-        return result
-
-    def values(self):
-        result = []
-        for child in self.children:
-            result.append(child.value)
-
-        return result
-
-class Document(KeyValueNode):
+class Record(Node):
     def __init__(self):
-        super().__init__()
-
-class Record(KeyValueNode):
-    def __init__(self):
-        super().__init__()
+        super().__init__(child_types=RecordItem)
 
 class Array(Node):
     def __init__(self):
@@ -145,16 +129,6 @@ class RecordItem(Node):
     def value(self, value):
         assert isinstance(value, (Record, Array, String))
         self.children[1] = value
-
-def decode(root):
-    """Decodes an AST subtree rooted at `root` into a Python data structure.
-    """
-    if isinstance(root, String):
-        return root.data
-    elif isinstance(root, Array):
-        decoded_children = [decode(child) for child in root.children]
-    elif isinstance(root, (Document, Record)):
-        pass
 
 def pretty_print(node):
     """Pretty-prints an AST subtree rooted at `node`.
@@ -192,14 +166,3 @@ def _pretty_print_impl(node, lines, prefix='', is_last_node=True):
             is_last_node = False
 
         _pretty_print_impl(child, lines, prefix, is_last_node)
-
-def _array_index_of_node(node):
-    """Returns the (0-based) index of `node` if it is an array element.
-    If it is not an array element, then None is returned.
-    """
-    if not isinstance(node.parent, Array):
-        return None
-
-    for i,child in enumerate(node.parent.children):
-        if child is node:
-            return i
