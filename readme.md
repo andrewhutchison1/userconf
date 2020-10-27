@@ -123,6 +123,8 @@ The following characters are reserved and have special meaning unless they appea
 - `[`, `]` (Array delimiters)
 - `,` (Record/array item separator)
 - `;` (Comment begin character)
+- `"` (Quoted string delimiter)
+- `>` (Multiline string begin character)
 
 #### Records
 
