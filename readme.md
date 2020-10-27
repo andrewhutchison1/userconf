@@ -19,6 +19,7 @@ format that is designed to be:
         - [Encoding](#encoding)
         - [Comments](#comments)
         - [Whitespace](#whitespace)
+        - [Reserved characters](#reserved-characters)
     - [Records](#records)
     - [Arrays](#arrays)
     - [Strings](#strings)
@@ -112,6 +113,16 @@ Line endings may be freely mixed in a Userconf document.
 Such a situation may result from a Userconf document saved by a Windows text editor with
 `\r\n` (CRLF) line endings that was concatenated with a Userconf document saved by a UNIX
 text editor with LF line endings (or vice versa).
+
+##### Reserved characters
+
+The following characters are reserved and have special meaning unless they appear in a string
+(and are also escaped, if necessary):
+
+- `{`, `}` (Record delimiters)
+- `[`, `]` (Array delimiters)
+- `,` (Record/array item separator)
+- `;` (Comment begin character)
 
 #### Records
 
